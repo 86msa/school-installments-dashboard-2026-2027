@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>لوحة الأقساط | 2026–2027</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/report-data.js" defer></script>
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" aria-label="القائمة الرئيسية">
+      <div class="brand"><span class="brand-icon"><span id="brand-mark">◈</span><img id="brand-logo" alt="شعار المدرسة" hidden></span><div><strong id="brand-name">لوحة الأقساط</strong><small>العام الدراسي <bdi dir="ltr">2026–2027</bdi></small></div></div>
+      <div class="side-label">الأقسام</div>
+      <nav class="nav">
+        <button class="nav-button active" data-view="overview"><span class="nav-icon">▦</span> نظرة عامة</button>
+        <button class="nav-button" data-view="students"><span class="nav-icon">♙</span> الطلاب والأقساط</button>
+        <button class="nav-button" data-view="receipts"><span class="nav-icon">▤</span> وصولات القبض</button>
+        <button class="nav-button" data-view="previous"><span class="nav-icon">◴</span> ديون 2025–2026</button>
+        <button class="nav-button" data-view="reports"><span class="nav-icon">▧</span> التقارير</button>
+        <button class="nav-button" data-view="settings"><span class="nav-icon">⚙</span> الإعدادات</button>
+      </nav>
+      <div class="sidebar-bottom"><span class="live-dot"></span> مرتبط بقاعدة بيانات البرنامج <small>عرض للقراءة فقط</small></div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div><div class="eyebrow">لوحة الإدارة المالية</div><h1 id="page-title">نظرة عامة على الأقساط</h1><p id="page-subtitle">متابعة التحصيل والاستحقاقات للعام الدراسي <bdi dir="ltr">2026–2027</bdi></p></div>
+        <div class="top-actions"><span class="year-pill" dir="ltr">2026 — 2027</span><div id="export-wrap" class="export-wrap"><button id="export-current" class="button button-outline" type="button" aria-expanded="false" aria-controls="export-menu">↓ تصدير القسم</button><div id="export-menu" class="export-menu" hidden><button type="button" data-section-export="xlsx">جدول إكسل</button><button type="button" data-section-export="csv">جدول نصي</button><button type="button" data-section-export="pdf">بي دي إف</button></div></div><button id="print-current" class="button button-outline" type="button">▧ طباعة القسم</button><button id="refresh-button" class="button button-primary" type="button">↻ <span>تحديث البيانات</span></button></div>
+      </header>
+      <div id="message" class="message" role="status" hidden></div>
+
+      <section id="overview" class="view active" aria-label="نظرة عامة">
+        <div id="overview-cards" class="cards-grid"></div>
+        <div class="section-grid">
+          <article class="panel panel-wide"><div class="panel-heading"><div><h2>التحصيل الشهري</h2><p>المبالغ المقبوضة بحسب تاريخ الوصل</p></div><span class="panel-mark">●</span></div><div id="monthly-chart" class="monthly-chart"></div></article>
+          <article class="panel"><div class="panel-heading"><div><h2>حالة سداد الطلاب</h2><p>وفق صافي القسط بعد الخصم</p></div></div><div id="status-chart"></div></article>
+        </div>
+        <div class="section-grid">
+          <article class="panel panel-wide"><div class="panel-heading"><div><h2>التحصيل حسب الصف</h2><p>المقبوض والمتبقي من صافي الأقساط</p></div></div><div id="class-chart" class="class-chart"></div></article>
+          <article class="panel emphasis-panel"><div class="panel-heading"><div><h2>ديون سنة 2025–2026</h2><p>أرصدة هذه السنة مستقلة عن أقساط 2026–2027</p></div></div><div id="previous-preview"></div><button class="text-button" data-go="previous" type="button">عرض تفاصيل الديون ←</button></article>
+        </div>
+        <article class="panel"><div class="panel-heading"><div><h2>أقساط متأخرة</h2><p>أول الحالات المستحقة حتى اليوم</p></div><button class="text-button" data-go="students" type="button">فتح كشف الطلاب ←</button></div><div id="overdue-preview" class="table-wrap"></div></article>
+      </section>
+
+      <section id="students" class="view" aria-label="الطلاب والأقساط">
+        <div class="view-heading"><div><h2>كشف الطلاب والأقساط</h2><p>انقر على الطالب لعرض وصولاته وتفاصيل حسابه.</p></div><span id="student-count" class="count-pill"></span></div>
+        <div class="filterbar"><label>بحث متعدد الكلمات<input id="students-search" type="search" placeholder="الاسم، الرقم، الصف أو الهاتف"></label><label>الصف<select id="students-class"></select></label><label>حالة السداد<select id="students-status"><option value="all">كل الحالات</option><option value="unpaid">غير مدفوع</option><option value="partial">مدفوع جزئياً</option><option value="paid">مسدد بالكامل</option><option value="overdue">متأخر</option></select></label><label>المتبقي من<input id="students-min" type="number" min="0" step="1000" placeholder="الحد الأدنى"></label><label>المتبقي إلى<input id="students-max" type="number" min="0" step="1000" placeholder="الحد الأعلى"></label><button class="button button-outline filter-clear" data-clear="students" type="button">مسح الفلاتر</button></div>
+        <div class="panel table-panel"><p class="table-hint">مرّر الجدول أفقياً لعرض بقية الأعمدة.</p><div id="students-table" class="table-wrap"></div><div id="students-pager" class="pager"></div></div>
+      </section>
+
+      <section id="receipts" class="view" aria-label="وصولات القبض">
+        <div class="view-heading"><div><h2>سجل وصولات القبض</h2><p>كل وصل مرتبط برقم الطالب المسجل في سنة <bdi dir="ltr">2026–2027</bdi>.</p></div><span id="receipt-count" class="count-pill"></span></div>
+        <div class="filterbar"><label>بحث متعدد الكلمات<input id="receipts-search" type="search" placeholder="الطالب، رقم الوصل أو الملاحظات"></label><label>الصف<select id="receipts-class"></select></label><label>من تاريخ<input id="receipts-from" type="date"></label><label>إلى تاريخ<input id="receipts-to" type="date"></label><button class="button button-outline filter-clear" data-clear="receipts" type="button">مسح الفلاتر</button></div>
+        <div class="panel table-panel"><p class="table-hint">مرّر الجدول أفقياً لعرض بقية الأعمدة.</p><div id="receipts-table" class="table-wrap"></div><div id="receipts-pager" class="pager"></div></div>
+      </section>
+
+      <section id="previous" class="view" aria-label="ديون سنة 2025–2026">
+        <div class="view-heading"><div><h2>ديون سنة 2025–2026</h2><p>حسابات هذه السنة مفصولة عن أقساط 2026–2027.</p></div><span id="previous-count" class="count-pill"></span></div>
+        <div id="previous-cards" class="cards-grid three-cards"></div>
+        <div class="filterbar"><label>بحث متعدد الكلمات<input id="previous-search" type="search" placeholder="اسم الطالب أو رقم الأرشيف"></label><label>الرصيد<select id="previous-status"><option value="open">الديون القائمة</option><option value="all">كل السجلات</option><option value="paid">المسددة</option></select></label><label>المتبقي من<input id="previous-min" type="number" min="0" step="1000" placeholder="الحد الأدنى"></label><button class="button button-outline filter-clear" data-clear="previous" type="button">مسح الفلاتر</button></div>
+        <div class="panel table-panel"><p class="table-hint">مرّر الجدول أفقياً لعرض بقية الأعمدة.</p><div id="previous-table" class="table-wrap"></div></div>
+      </section>
+
+      <section id="reports" class="view" aria-label="التقارير">
+        <div class="view-heading"><div><h2>اختر التقرير</h2><p>حدد نوع الكشف، ثم راجع تفاصيله واطبعه أو احفظه.</p></div></div>
+        <div class="filterbar report-controls"><label>نوع التقرير<select id="report-type"><option value="classes">ملخص الصفوف</option><option value="students">أقساط الطلاب</option><option value="unpaid">الطلاب غير الدافعين</option><option value="partial">المدفوع جزئياً</option><option value="paid">المسددون بالكامل</option><option value="overdue">الأقساط المتأخرة</option><option value="receipts">وصولات القبض</option><option value="previous-open">ديون 2025–2026 القائمة</option><option value="previous">كل سجلات ديون 2025–2026</option></select></label><label>بحث متعدد الكلمات<input id="report-search" type="search" placeholder="اسم، رقم، صف أو ملاحظة"></label><label id="report-class-wrap">الصف<select id="report-class"></select></label><label id="report-from-wrap" hidden>من تاريخ<input id="report-from" type="date"></label><label id="report-to-wrap" hidden>إلى تاريخ<input id="report-to" type="date"></label><button class="button button-outline filter-clear" data-clear="reports" type="button">مسح الفلاتر</button><div class="report-actions"><label>صيغة التصدير<select id="export-format"><option value="xlsx">جدول إكسل</option><option value="csv">جدول نصي</option><option value="pdf">بي دي إف</option></select></label><button id="export-button" class="button button-primary" type="button">↓ تصدير</button><button id="print-button" class="button button-outline" type="button">▧ معاينة وطباعة</button></div></div>
+        <article class="panel table-panel"><div class="report-heading"><h3 id="report-title"></h3><span id="report-meta"></span></div><p class="table-hint">مرّر الجدول أفقياً لعرض بقية الأعمدة.</p><div id="report-table" class="table-wrap"></div></article>
+      </section>
+
+      <section id="settings" class="view" aria-label="الإعدادات">
+        <div class="view-heading"><div><h2>إعدادات البرنامج</h2><p>اضبط اسم المدرسة ومصدر البيانات والمظهر والنسخ الاحتياطي.</p></div></div>
+        <article class="panel settings-panel">
+          <div class="panel-heading"><div><h2>مصدر البيانات</h2><p>تتصل اللوحة بالملف المحدد للقراءة فقط.</p></div><span id="database-state" class="count-pill">جارٍ التحقق…</span></div>
+          <div class="settings-current"><span>الملف المستخدم حالياً</span><strong id="database-current" dir="ltr">جارٍ التحميل…</strong></div>
+          <form id="database-form" class="settings-form">
+            <label for="database-path">مسار ملف قاعدة البيانات</label>
+            <div class="settings-path-row"><input id="database-path" type="text" dir="ltr" spellcheck="false" autocomplete="off" required aria-describedby="database-help"><button id="database-browse" class="button button-outline" type="button">استعراض الملفات</button></div>
+            <p id="database-help">اختر ملف قاعدة بيانات البرنامج أو اكتب مساره الكامل، ثم اضغط حفظ. سيتم فحصه قبل اعتماده.</p>
+            <div class="settings-actions"><button id="database-save" class="button button-primary" type="submit">حفظ مصدر البيانات</button><span id="database-feedback" role="status" aria-live="polite"></span></div>
+          </form>
+        </article>
+        <div class="settings-grid">
+          <article class="panel settings-panel">
+            <div class="panel-heading"><div><h2>اسم المدرسة</h2><p>يظهر في القائمة وعنوان النافذة ورأس التقارير المطبوعة.</p></div></div>
+            <form id="school-name-form" class="settings-form"><label for="school-name">الاسم الظاهر في البرنامج</label><div class="settings-path-row"><input id="school-name" type="text" maxlength="80" required autocomplete="organization" placeholder="اكتب اسم المدرسة" dir="auto"></div><div class="settings-actions"><button id="school-name-save" class="button button-primary" type="submit">حفظ اسم المدرسة</button><span id="school-name-feedback" role="status" aria-live="polite"></span></div></form>
+          </article>
+          <article class="panel settings-panel">
+            <div class="panel-heading"><div><h2>شعار المدرسة</h2><p>يظهر في القائمة ورأس الصفحات المطبوعة.</p></div></div>
+            <div class="logo-settings"><div id="logo-preview" class="logo-preview">◈</div><div class="logo-controls"><span class="field-label">اختر صورة واضحة مربعة أو مستطيلة</span><div class="logo-pick"><label for="logo-input" class="button button-outline">اختيار صورة</label><span id="logo-file-name">لم تُحدد صورة</span></div><input id="logo-input" class="visually-hidden" type="file" accept="image/png,image/jpeg" aria-label="اختيار صورة الشعار"><div class="settings-actions"><button id="logo-save" class="button button-primary" type="button">حفظ الشعار</button><button id="logo-remove" class="button button-outline" type="button">إزالة الشعار</button></div><span id="logo-feedback" role="status"></span></div></div>
+          </article>
+          <article class="panel settings-panel">
+            <div class="panel-heading"><div><h2>ألوان الواجهة</h2><p>اختر لون الأزرار والبطاقات ولون القائمة.</p></div></div>
+            <div class="theme-fields"><label>اللون الرئيسي<input id="theme-primary" type="color" value="#197652"></label><label>لون القائمة<input id="theme-sidebar" type="color" value="#153f38"></label></div>
+            <div class="settings-actions"><button id="theme-save" class="button button-primary" type="button">حفظ الألوان</button><button id="theme-reset" class="button button-outline" type="button">استعادة الألوان الأصلية</button><span id="theme-feedback" role="status"></span></div>
+          </article>
+        </div>
+        <article class="panel settings-panel backup-panel"><div class="panel-heading"><div><h2>نسخة احتياطية</h2><p>تنزيل نسخة من قاعدة البيانات مع اسم المدرسة والألوان والشعار في ملف مضغوط.</p></div></div><p>لنسخة مستقرة، أغلق برنامج المدرسة أثناء إنشاء النسخة الاحتياطية.</p><div class="settings-actions"><button id="backup-button" class="button button-primary" type="button">تنزيل نسخة احتياطية</button><span id="backup-feedback" role="status"></span></div></article>
+      </section>
+
+      <footer class="footer"><span id="last-updated">جارٍ قراءة البيانات…</span><span>المبالغ بالدينار العراقي</span></footer>
+    </main>
+  </div>
+
+  <div id="detail-overlay" class="detail-overlay" hidden><div class="detail-backdrop" data-close-detail></div><aside class="detail-drawer" role="dialog" aria-modal="true" aria-labelledby="detail-title"><button id="detail-close" class="close-button" type="button" aria-label="إغلاق">×</button><div id="detail-content"></div><div class="detail-actions"><button id="detail-print" class="button button-primary" type="button">▧ معاينة وطباعة ملف الطالب</button></div></aside></div>
+  <div id="print-preview" class="preview-overlay" hidden><div class="preview-backdrop" data-close-preview></div><section class="preview-dialog" role="dialog" aria-modal="true" aria-labelledby="preview-title"><div class="preview-toolbar"><div><h2 id="preview-title">معاينة الطباعة</h2><p id="preview-subtitle"></p></div><fieldset class="orientation-picker"><legend>اتجاه الصفحة</legend><label><input type="radio" name="print-orientation" value="portrait"> عامودي</label><label><input type="radio" name="print-orientation" value="landscape" checked> أفقي</label></fieldset><div class="preview-actions"><button id="preview-pdf" class="button button-outline" type="button">↓ حفظ بي دي إف</button><button id="preview-print" class="button button-primary" type="button">▧ طباعة</button><button id="preview-close" class="button button-outline" type="button">إغلاق</button></div></div><p id="preview-feedback" role="status"></p><iframe id="print-frame" title="معاينة المستند قبل الطباعة"></iframe></section></div>
+  <section id="print-document" aria-label="مستند الطباعة"></section>
+</body>
+</html>

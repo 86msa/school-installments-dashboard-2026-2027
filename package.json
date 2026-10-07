@@ -1,0 +1,54 @@
+{
+  "name": "school-installments-dashboard",
+  "version": "1.2.0",
+  "private": true,
+  "description": "لوحة الأقساط للعام الدراسي 2026-2027",
+  "author": "إدارة المدرسة",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test metrics.test.js",
+    "build:win": "electron-builder --win nsis --x64"
+  },
+  "devDependencies": {
+    "electron": "44.6.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.school.installments.dashboard",
+    "productName": "لوحة الأقساط 2026-2027",
+    "artifactName": "SchoolInstallmentsSetup-${version}.${ext}",
+    "asar": true,
+    "asarUnpack": [
+      "*.ps1"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron-main.js",
+      "server.js",
+      "backup.js",
+      "xlsx.js",
+      "preload.js",
+      "pdf-worker.js",
+      "metrics.js",
+      "read-data.ps1",
+      "select-database.ps1",
+      "public/**/*",
+      "assets/icon.png",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico",
+      "signExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

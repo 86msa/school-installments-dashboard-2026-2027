@@ -1,0 +1,13 @@
+node_modules/
+dist/
+نسخة التثبيت/
+dashboard-settings.json
+*.mdb
+*.accdb
+*.zip
+*.pdf
+*.xlsx
+*.csv
+*.log
+.env*
+/*.png

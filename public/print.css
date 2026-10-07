@@ -1,0 +1,75 @@
+@font-face { font-family: "Noto Naskh Arabic"; src: url('/fonts/NotoNaskhArabic.ttf') format('truetype'); font-weight: 400 700; font-display: swap; }
+@page { size: A4 __ORIENTATION__; margin: 13mm 12mm 15mm; }
+* { box-sizing: border-box; }
+html { color: #183b2b; font-family: "Noto Naskh Arabic", serif; --print-primary: __PRIMARY__; }
+body { margin: 0; background: #e9efeb; font-size: 11px; line-height: 1.6; }
+#print-document { background: #fff; margin: 18px auto; padding: 12mm; width: 297mm; min-height: 210mm; box-shadow: 0 12px 35px #17382a1c; }
+body.portrait #print-document { width: 210mm; min-height: 297mm; }
+.print-header { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-bottom: 11px; border-bottom: 2px solid var(--print-primary); }
+.print-brand { display: flex; align-items: center; gap: 10px; }
+.print-brand > img, .print-brand > span { width: 42px; height: 42px; object-fit: contain; display: grid; place-items: center; font-size: 27px; color: var(--print-primary); }
+.print-brand strong { display: block; font-size: 17px; }
+.print-brand small { display: block; font-size: 10px; color: #52705c; }
+.print-date { color: #42614e; font-size: 10px; }
+.print-title { margin: 16px 0 13px; }
+.print-title h1 { font-size: 20px; margin: 0 0 3px; }
+.print-title p { margin: 0; color: #42614e; font-size: 10px; }
+.print-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin: 0 0 15px; }
+.print-summary > div { border: 1px solid #d5e4d9; border-radius: 7px; padding: 8px; }
+.print-summary strong { display: block; font-size: 13px; color: var(--print-primary); white-space: nowrap; }
+.print-chart-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin: 13px 0; }
+.print-chart-card { border: 1px solid #d5e4d9; border-radius: 8px; padding: 9px 11px; break-inside: avoid; min-width: 0; }
+.print-chart-card h2 { margin: 0; font-size: 14px; color: #1c5035; }
+.print-chart-card p { margin: 0 0 7px; color: #587160; font-size: 9px; }
+.print-wide { grid-column: 1 / -1; }
+.print-monthly { display: flex; align-items: end; justify-content: space-around; gap: 3px; height: 130px; }
+.print-month { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; }
+.print-month > span { font-size: 8px; white-space: nowrap; }
+.print-month small { font-size: 9px; white-space: nowrap; }
+.print-month-track { position: relative; width: min(19px, 100%); height: 91px; }
+.print-month-track i { position: absolute; bottom: 0; right: 0; width: 100%; background: var(--print-primary); border-radius: 4px 4px 0 0; }
+.print-status { display: flex; align-items: center; justify-content: center; gap: 17px; min-height: 130px; }
+.print-donut { width: 91px; height: 91px; flex: none; border-radius: 50%; display: grid; place-items: center; }
+.print-donut > div { width: 61px; height: 61px; display: grid; place-content: center; text-align: center; border-radius: 50%; background: white; font-size: 20px; font-weight: 700; }
+.print-donut small { display: block; font-size: 9px; font-weight: 400; }
+.print-legend { display: grid; gap: 8px; min-width: 96px; }
+.print-legend span { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+.print-legend strong { margin-inline-start: auto; }
+.print-dot { width: 9px; height: 9px; display: inline-block; flex: none; border-radius: 50%; }
+.print-paid, .print-class-paid { background: #2ba36f; }
+.print-partial { background: #f0b765; }
+.print-unpaid, .print-class-balance, .print-balance { background: #dce9e2; }
+.print-classes { display: grid; gap: 5px; }
+.print-class-row { display: grid; grid-template-columns: 115px minmax(0, 1fr) 114px; align-items: center; gap: 7px; }
+.print-class-track { display: flex; height: 10px; overflow: hidden; border-radius: 5px; background: #edf3ee; }
+.print-class-track i { height: 100%; }
+.print-class-row small { white-space: nowrap; font-size: 9px; }
+.print-key { display: flex; justify-content: flex-end; gap: 12px; margin-top: 6px; font-size: 9px; }
+.print-key span { display: flex; align-items: center; gap: 4px; }
+.print-overview-bottom { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; margin-bottom: 12px; }
+.print-overview-bottom > section { break-inside: avoid; min-width: 0; }
+.print-overview-bottom p { margin: 0; }
+.print-overview-bottom .print-table { font-size: 9px; }
+.print-overview-bottom .print-table th, .print-overview-bottom .print-table td { padding: 2px 4px; }
+.print-section-title { font-size: 14px; margin: 17px 0 8px; color: #1c5035; }
+.print-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.print-table thead { display: table-header-group; }
+.print-table tr { break-inside: avoid; }
+.print-table th { background: #e8f1eb; color: #1e5034; border: 1px solid #c7dbc9; font-weight: 700; }
+.print-table td { border: 1px solid #d9e5dc; color: #223f2c; }
+.print-table th, .print-table td { padding: 6px 5px; text-align: right; vertical-align: top; overflow-wrap: anywhere; }
+.print-table tbody tr:nth-child(even) { background: #f8faf8; }
+.print-number { font-variant-numeric: tabular-nums; }
+.print-footer { display: flex; justify-content: space-between; border-top: 1px solid #d6e3d9; margin-top: 15px; padding-top: 6px; color: #56715e; font-size: 9px; }
+body.portrait .print-table { font-size: 9px; }
+body.portrait .print-table th, body.portrait .print-table td { padding: 5px 3px; }
+body.portrait .print-chart-grid, body.portrait .print-overview-bottom { grid-template-columns: 1fr; }
+body.portrait .print-wide { grid-column: auto; }
+@media screen and (max-width: 900px) {
+  body.portrait #print-document { zoom: .78; }
+  body.landscape #print-document { zoom: .55; }
+}
+@media print {
+  html, body { background: white; print-color-adjust: exact; }
+  #print-document, body.portrait #print-document, body.landscape #print-document { margin: 0; padding: 0; width: auto; min-height: 0; box-shadow: none; zoom: 1; }
+}
