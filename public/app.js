@@ -29,10 +29,10 @@ function card(label, value, help = '', icon = '◇', type = '') {
 
 function table(headers, rows, empty = 'لا توجد سجلات مطابقة') {
   if (!rows.length) return `<div class="empty">${escapeHtml(empty)}</div>`;
-  return `<table class="data-table"><thead><tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr>${row.map(cell => {
+  return `<table class="data-table${headers.length > 10 ? ' dense-table' : ''}"><thead><tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr>${row.map((cell, index) => {
     const content = typeof cell === 'object' && cell !== null ? (cell.html ?? escapeHtml(cell.value)) : escapeHtml(cell);
     const numeric = typeof cell === 'object' && cell !== null && cell.numeric ? ' class="numeric"' : '';
-    return `<td${numeric}>${content}</td>`;
+    return `<td data-label="${escapeHtml(headers[index])}"${numeric}>${content}</td>`;
   }).join('')}</tr>`).join('')}</tbody></table>`;
 }
 
@@ -154,11 +154,14 @@ function renderDiscounts() {
   $('discount-count').textContent = `${money(rows.length)} من ${money(state.data.summary.discountedStudents)} مستفيد`;
   const pages = Math.max(1, Math.ceil(rows.length / pageSize));
   state.discountsPage = Math.min(state.discountsPage, pages);
-  $('discounts-table').innerHTML = table(['الطالب', 'الصف', 'الشعبة', 'القسط قبل الخصم', 'الخصم', 'نسبة الخصم', 'سبب الخصم', 'الصافي', 'المقبوض', 'المتبقي'], rows.slice((state.discountsPage - 1) * pageSize, state.discountsPage * pageSize).map(row => [
-    { html: `<button class="row-button" data-student="${row.id}">${escapeHtml(row.name)}</button>` }, row.className, row.section || '—',
-    { value: amount(row.gross), numeric: true }, { value: amount(row.discount), numeric: true },
-    { value: percent(row.discountRate), numeric: true }, { html: `<span class="discount-reason">${escapeHtml(row.discountReason || 'غير مسجل')}</span>` }, { value: amount(row.net), numeric: true },
-    { value: amount(row.paid), numeric: true }, { value: amount(row.balance), numeric: true }
+  $('discounts-table').innerHTML = table(['الطالب', 'الصف والشعبة', 'القسط قبل الخصم', 'الخصم ونسبته', 'سبب الخصم', 'صافي القسط', 'حالة الحساب'], rows.slice((state.discountsPage - 1) * pageSize, state.discountsPage * pageSize).map(row => [
+    { html: `<button class="row-button" data-student="${row.id}">${escapeHtml(row.name)}</button><small class="cell-secondary">رقم ${money(row.id)}</small>` },
+    { html: `${escapeHtml(row.className)}<small class="cell-secondary">الشعبة: ${escapeHtml(row.section || 'غير مسجلة')}</small>` },
+    { value: amount(row.gross), numeric: true },
+    { html: `<strong class="cell-money discount-amount">${amount(row.discount)}</strong><small class="cell-secondary">${percent(row.discountRate)} من القسط</small>` },
+    { html: `<span class="discount-reason">${escapeHtml(row.discountReason || 'غير مسجل')}</span>` },
+    { value: amount(row.net), numeric: true },
+    { html: `<div class="account-lines"><small>المقبوض</small><span class="cell-money">${amount(row.paid)}</span><small>المتبقي</small><span class="cell-money">${amount(row.balance)}</span></div>` }
   ]), 'لا يوجد طلاب حاصلون على خصومات ضمن هذه الفلاتر');
   $('discounts-pager').innerHTML = pager('discounts', state.discountsPage, pages);
 }

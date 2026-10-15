@@ -53,7 +53,7 @@
       <section id="students" class="view" aria-label="الطلاب والأقساط">
         <div class="view-heading"><div><h2>كشف الطلاب والأقساط</h2><p>انقر على الطالب لعرض وصولاته وتفاصيل حسابه.</p></div><span id="student-count" class="count-pill"></span></div>
         <div class="filterbar"><label>بحث متعدد الكلمات<input id="students-search" type="search" placeholder="الاسم، الرقم، الصف أو الهاتف"></label><label>الصف<select id="students-class"></select></label><label>حالة السداد<select id="students-status"><option value="all">كل الحالات</option><option value="unpaid">غير مدفوع</option><option value="partial">مدفوع جزئياً</option><option value="paid">مسدد بالكامل</option><option value="overdue">متأخر</option></select></label><label>المتبقي من<input id="students-min" type="number" min="0" step="1000" placeholder="الحد الأدنى"></label><label>المتبقي إلى<input id="students-max" type="number" min="0" step="1000" placeholder="الحد الأعلى"></label><button class="button button-outline filter-clear" data-clear="students" type="button">مسح الفلاتر</button></div>
-        <div class="panel table-panel"><p class="table-hint">مرّر الجدول أفقياً لعرض بقية الأعمدة.</p><div id="students-table" class="table-wrap"></div><div id="students-pager" class="pager"></div></div>
+        <div class="panel table-panel"><p class="table-hint">تتكيّف البيانات مع عرض النافذة؛ انقر على الطالب لعرض ملفه الكامل.</p><div id="students-table" class="table-wrap"></div><div id="students-pager" class="pager"></div></div>
       </section>
 
       <section id="discounts" class="view" aria-label="الخصومات">
@@ -66,20 +66,20 @@
       <section id="receipts" class="view" aria-label="وصولات القبض">
         <div class="view-heading"><div><h2>سجل وصولات القبض</h2><p>كل وصل مرتبط برقم الطالب المسجل في سنة <bdi dir="ltr">2026–2027</bdi>.</p></div><span id="receipt-count" class="count-pill"></span></div>
         <div class="filterbar"><label>بحث متعدد الكلمات<input id="receipts-search" type="search" placeholder="الطالب، رقم الوصل أو الملاحظات"></label><label>الصف<select id="receipts-class"></select></label><label>من تاريخ<input id="receipts-from" type="date"></label><label>إلى تاريخ<input id="receipts-to" type="date"></label><button class="button button-outline filter-clear" data-clear="receipts" type="button">مسح الفلاتر</button></div>
-        <div class="panel table-panel"><p class="table-hint">مرّر الجدول أفقياً لعرض بقية الأعمدة.</p><div id="receipts-table" class="table-wrap"></div><div id="receipts-pager" class="pager"></div></div>
+        <div class="panel table-panel"><p class="table-hint">تتكيّف البيانات مع عرض النافذة؛ انقر على الطالب لعرض ملفه الكامل.</p><div id="receipts-table" class="table-wrap"></div><div id="receipts-pager" class="pager"></div></div>
       </section>
 
       <section id="previous" class="view" aria-label="ديون سنة 2025–2026">
         <div class="view-heading"><div><h2>ديون سنة 2025–2026</h2><p>حسابات هذه السنة مفصولة عن أقساط 2026–2027.</p></div><span id="previous-count" class="count-pill"></span></div>
         <div id="previous-cards" class="cards-grid three-cards"></div>
         <div class="filterbar"><label>بحث متعدد الكلمات<input id="previous-search" type="search" placeholder="اسم الطالب أو رقم الأرشيف"></label><label>الرصيد<select id="previous-status"><option value="open">الديون القائمة</option><option value="all">كل السجلات</option><option value="paid">المسددة</option></select></label><label>المتبقي من<input id="previous-min" type="number" min="0" step="1000" placeholder="الحد الأدنى"></label><button class="button button-outline filter-clear" data-clear="previous" type="button">مسح الفلاتر</button></div>
-        <div class="panel table-panel"><p class="table-hint">مرّر الجدول أفقياً لعرض بقية الأعمدة.</p><div id="previous-table" class="table-wrap"></div></div>
+        <div class="panel table-panel"><p class="table-hint">تتكيّف البيانات مع عرض النافذة؛ انقر على الطالب لعرض ملفه الكامل.</p><div id="previous-table" class="table-wrap"></div></div>
       </section>
 
       <section id="reports" class="view" aria-label="التقارير">
         <div class="view-heading"><div><h2>اختر التقرير</h2><p>حدد نوع الكشف، ثم راجع تفاصيله واطبعه أو احفظه.</p></div></div>
         <div class="filterbar report-controls"><label>نوع التقرير<select id="report-type"><option value="classes">ملخص الصفوف</option><option value="students">أقساط الطلاب</option><option value="discounts">الطلاب الحاصلون على الخصومات</option><option value="unpaid">الطلاب غير الدافعين</option><option value="partial">المدفوع جزئياً</option><option value="paid">المسددون بالكامل</option><option value="overdue">الأقساط المتأخرة</option><option value="receipts">وصولات القبض</option><option value="previous-open">ديون 2025–2026 القائمة</option><option value="previous">كل سجلات ديون 2025–2026</option></select></label><label>بحث متعدد الكلمات<input id="report-search" type="search" placeholder="اسم، رقم، صف أو ملاحظة"></label><label id="report-class-wrap">الصف<select id="report-class"></select></label><label id="report-from-wrap" hidden>من تاريخ<input id="report-from" type="date"></label><label id="report-to-wrap" hidden>إلى تاريخ<input id="report-to" type="date"></label><button class="button button-outline filter-clear" data-clear="reports" type="button">مسح الفلاتر</button><div class="report-actions"><label>صيغة التصدير<select id="export-format"><option value="xlsx">جدول إكسل</option><option value="csv">جدول نصي</option><option value="pdf">بي دي إف</option></select></label><button id="export-button" class="button button-primary" type="button">↓ تصدير</button><button id="print-button" class="button button-outline" type="button">▧ معاينة وطباعة</button></div></div>
-        <article class="panel table-panel"><div class="report-heading"><h3 id="report-title"></h3><span id="report-meta"></span></div><p class="table-hint">مرّر الجدول أفقياً لعرض بقية الأعمدة.</p><div id="report-table" class="table-wrap"></div></article>
+        <article class="panel table-panel"><div class="report-heading"><h3 id="report-title"></h3><span id="report-meta"></span></div><p class="table-hint">تتكيّف البيانات مع عرض النافذة؛ انقر على الطالب لعرض ملفه الكامل.</p><div id="report-table" class="table-wrap"></div></article>
       </section>
 
       <section id="settings" class="view" aria-label="الإعدادات">
