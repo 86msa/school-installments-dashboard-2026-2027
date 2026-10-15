@@ -62,6 +62,7 @@ function buildDashboard(raw, today = new Date()) {
     return {
       id: student.ID, name: student.StName || '', className: student.Class || '',
       section: student.Shu || '', gross, discount, discountRate: gross > 0 ? discount / gross : 0, net, paid, balance,
+      discountReason: String(student.Because ?? '').trim(),
       recordedBalance, discrepancy: net - paid - recordedBalance,
       status, nextDueDate, nextDueAmount: number(student.ValueNextQst),
       overdue: balance > 0 && Boolean(nextDueDate) && nextDueDate < dateKey,

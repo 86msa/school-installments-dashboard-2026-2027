@@ -22,7 +22,7 @@ function selectDiscounts(data, query = '', filters = {}) {
     (!filters.className || filters.className === 'all' || r.className === filters.className) &&
     (minRate === null || (r.gross > 0 ? r.discount / r.gross * 100 : 0) >= minRate) &&
     (maxRate === null || (r.gross > 0 ? r.discount / r.gross * 100 : 0) <= maxRate) &&
-    matchesFields([r.name, r.id, r.className, r.section, r.fatherMobile, r.motherMobile], query))
+    matchesFields([r.name, r.id, r.className, r.section, r.discountReason, r.fatherMobile, r.motherMobile], query))
     .sort((a, b) => b.discount - a.discount || String(a.name).localeCompare(String(b.name), 'ar'));
 }
 
@@ -41,9 +41,9 @@ function createReport(data, type = 'classes', query = '', filters = {}) {
         r.gross > 0 ? `${(r.discount / r.gross * 100).toFixed(1)}%` : '0%', r.discountedStudents || 0]);
   } else if (type === 'discounts') {
     title = 'كشف الطلاب الحاصلين على الخصومات';
-    headers = ['رقم الطالب', 'الاسم', 'الصف', 'الشعبة', 'الإجمالي', 'الخصم', 'نسبة الخصم', 'الصافي', 'المقبوض', 'المتبقي'];
+    headers = ['رقم الطالب', 'الاسم', 'الصف', 'الشعبة', 'الإجمالي', 'الخصم', 'نسبة الخصم', 'الصافي', 'المقبوض', 'المتبقي', 'سبب الخصم'];
     rows = selectDiscounts(data, query, filters).map(r => [r.id, r.name, r.className, r.section,
-      r.gross, r.discount, `${(r.gross > 0 ? r.discount / r.gross * 100 : 0).toFixed(1)}%`, r.net, r.paid, r.balance]);
+      r.gross, r.discount, `${(r.gross > 0 ? r.discount / r.gross * 100 : 0).toFixed(1)}%`, r.net, r.paid, r.balance, r.discountReason || 'غير مسجل']);
   } else if (['students', 'overdue', 'unpaid', 'partial', 'paid'].includes(type)) {
     title = { students: 'تقرير أقساط الطلاب', overdue: 'كشف الأقساط المتأخرة',
       unpaid: 'الطلاب غير الدافعين', partial: 'المدفوع جزئياً', paid: 'المسددون بالكامل' }[type];

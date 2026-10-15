@@ -36,8 +36,8 @@
       <section id="overview" class="view active" aria-label="نظرة عامة">
         <div id="overview-cards" class="cards-grid overview-cards"></div>
         <div class="section-grid discount-grid">
-          <article class="panel"><div class="panel-heading"><div><h2>الخصومات من إجمالي الأقساط</h2><p>نسبة الخصومات إلى الأقساط قبل الخصم لسنة 2026–2027</p></div><button class="text-button" data-go="discounts" type="button">كشف الخصومات ←</button></div><div id="discount-chart"></div></article>
-          <article class="panel"><div class="panel-heading"><div><h2>الخصومات حسب الصف</h2><p>مبلغ الخصم ونسبته من إجمالي أقساط كل صف</p></div></div><div id="discount-class-chart" class="class-chart"></div></article>
+          <article class="panel discount-summary-panel"><div class="panel-heading"><div><h2>الخصومات من إجمالي الأقساط</h2><p>من الأقساط قبل الخصم · 2026–2027</p></div></div><div id="discount-chart"></div><button class="text-button discount-link" data-go="discounts" type="button">كشف الطلاب المستفيدين ←</button></article>
+          <article class="panel discount-classes-panel"><div class="panel-heading"><div><h2>الخصومات حسب الصف</h2><p>مبلغ الخصم ونسبته من إجمالي أقساط كل صف</p></div></div><div id="discount-class-chart" class="class-chart"></div></article>
         </div>
         <div class="section-grid">
           <article class="panel panel-wide"><div class="panel-heading"><div><h2>التحصيل الشهري</h2><p>المبالغ المقبوضة بحسب تاريخ الوصل</p></div><span class="panel-mark">●</span></div><div id="monthly-chart" class="monthly-chart"></div></article>
@@ -59,7 +59,7 @@
       <section id="discounts" class="view" aria-label="الخصومات">
         <div class="view-heading"><div><h2>الطلاب الحاصلون على الخصومات</h2><p>السنة 2026–2027 · نسبة كل طالب = الخصم ÷ القسط قبل الخصم. القائمة مرتبة حسب مبلغ الخصم.</p></div><span id="discount-count" class="count-pill"></span></div>
         <div id="discount-cards" class="cards-grid three-cards"></div>
-        <div class="filterbar"><label>بحث متعدد الكلمات<input id="discounts-search" type="search" placeholder="الاسم، الرقم، الصف أو الهاتف"></label><label>الصف<select id="discounts-class"></select></label><label>نسبة الخصم من<input id="discounts-min-rate" type="number" min="0" step="0.1" placeholder="0%"></label><label>نسبة الخصم إلى<input id="discounts-max-rate" type="number" min="0" step="0.1" placeholder="100%"></label><button class="button button-outline filter-clear" data-clear="discounts" type="button">مسح الفلاتر</button></div>
+        <div class="filterbar"><label>بحث متعدد الكلمات<input id="discounts-search" type="search" placeholder="الاسم، سبب الخصم، الرقم أو الهاتف"></label><label>الصف<select id="discounts-class"></select></label><label>نسبة الخصم من<input id="discounts-min-rate" type="number" min="0" step="0.1" placeholder="0%"></label><label>نسبة الخصم إلى<input id="discounts-max-rate" type="number" min="0" step="0.1" placeholder="100%"></label><button class="button button-outline filter-clear" data-clear="discounts" type="button">مسح الفلاتر</button></div>
         <div class="panel table-panel"><p class="table-hint">الإحصائيات أعلاه تخص نتائج البحث والفلترة. النسبة الإجمالية هي مجموع الخصومات ÷ مجموع الأقساط قبل الخصم للطلاب الظاهرين.</p><div id="discounts-table" class="table-wrap"></div><div id="discounts-pager" class="pager"></div></div>
       </section>
 

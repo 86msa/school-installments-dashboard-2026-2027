@@ -58,7 +58,7 @@ $connection = New-Object System.Data.OleDb.OleDbConnection($connectionString)
 try {
     $connection.Open()
     $payload = [ordered]@{
-        students = @(Read-Rows $connection 'SELECT ID, sn, StName, Class, Shu, QstAll, DisCount, Baqi, DateNextQst, ValueNextQst, FatherMobile, MotherMobile, Deleted FROM St')
+        students = @(Read-Rows $connection 'SELECT ID, sn, StName, Class, Shu, QstAll, DisCount, Because, Baqi, DateNextQst, ValueNextQst, FatherMobile, MotherMobile, Deleted FROM St')
         receipts = @(Read-Rows $connection 'SELECT IDMain, ID, idd, Class, WslValue, WslDate, Notes FROM Wesolat')
         previousStudents = @(Read-Rows $connection 'SELECT ID, sn, StName, Class, QstAll, DisCount, Baqi, Deleted FROM Arch')
         previousReceipts = @(Read-Rows $connection 'SELECT ID, idd, WslValue, WslDate FROM ArchWsls')

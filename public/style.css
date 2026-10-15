@@ -93,7 +93,26 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .cards-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 15px; margin-bottom: 20px; }
 .cards-grid.three-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .cards-grid.overview-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.section-grid.discount-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.overview-cards .stat-card { min-height: 134px; padding: 16px 18px; }
+.overview-cards .stat-value { margin-top: 10px; }
+.section-grid.discount-grid { grid-template-columns: minmax(300px, .8fr) minmax(0, 1.2fr); align-items: start; }
+.discount-summary-panel { padding: 18px 20px; }
+.discount-summary-panel .panel-heading { margin-bottom: 10px; }
+.discount-summary-panel .panel-heading h2 { font-size: 16px; }
+.discount-summary-panel .panel-heading p { font-size: 11px; }
+.discount-summary-panel .discount-donut { padding: 4px 0; gap: 14px; }
+.discount-donut .donut { width: 96px; height: 96px; }
+.discount-donut .donut-inner { width: 66px; height: 66px; }
+.discount-donut .donut-inner strong { font-size: 20px; }
+.discount-donut .donut-inner small { font-size: 9px; }
+.discount-donut .legend { gap: 7px; }
+.discount-donut .legend-item, .discount-donut .legend-item strong { font-size: 11px; }
+.discount-link { margin-top: 10px; }
+.discount-classes-panel #discount-class-chart { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 20px; }
+.discount-classes-panel .discount-class-row { grid-template-columns: 1fr; gap: 2px; }
+.discount-classes-panel .discount-class-row strong { font-size: 11px; }
+.discount-classes-panel .class-track { height: 7px; margin: 3px 0; }
+.discount-reason { display: block; min-width: 145px; max-width: 260px; white-space: normal; overflow-wrap: anywhere; }
 .legend-discount, .discount-bar { background: #9464bc; }
 .discount-bar { height: 100%; }
 .discount-class-row { display: grid; grid-template-columns: 1fr auto; gap: 5px 12px; font-size: 12px; }
@@ -260,10 +279,14 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 #print-document { display: none; }
 
 @media (max-width: 1300px) {
-  .cards-grid, .cards-grid.overview-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .section-grid, .section-grid.discount-grid { grid-template-columns: 1fr; }
+  .cards-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .section-grid { grid-template-columns: 1fr; }
   .main { padding: 28px 25px; }
   .settings-grid { grid-template-columns: 1fr; max-width: 850px; }
+}
+@media (max-width: 1100px) {
+  .section-grid.discount-grid { grid-template-columns: 1fr; }
+  .cards-grid.overview-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 750px) {
   .shell { display: block; }

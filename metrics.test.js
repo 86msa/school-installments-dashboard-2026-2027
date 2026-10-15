@@ -73,7 +73,7 @@ test('parses amount and percentage discounts', () => {
 test('discount totals use weighted gross fees and keep deleted and prior-year students out', () => {
   const data = buildDashboard({
     students: [
-      { ID: 1, StName: 'طالب تجريبي أ', Class: 'الاول', QstAll: 1000, DisCount: '10٪', Baqi: 900 },
+      { ID: 1, StName: 'طالب تجريبي أ', Class: 'الاول', QstAll: 1000, DisCount: '10٪', Because: '  خصم إخوة  ', Baqi: 900 },
       { ID: 2, StName: 'طالب تجريبي ب', Class: 'الثاني', QstAll: 3000, DisCount: '600', Baqi: 2400 },
       { ID: 3, StName: 'دون خصم', Class: 'الاول', QstAll: 1000, DisCount: '', Baqi: 1000 },
       { ID: 4, StName: 'محذوف', Class: 'الاول', QstAll: 10000, DisCount: '50%', Deleted: true }
@@ -85,12 +85,18 @@ test('discount totals use weighted gross fees and keep deleted and prior-year st
   assert.equal(data.summary.discountedStudents, 2);
   assert.equal(data.summary.discountedStudentRate, 2 / 3);
   assert.equal(data.students[0].discountRate, 0.1);
+  assert.equal(data.students[0].discountReason, 'خصم إخوة');
+  assert.equal(data.students[1].discountReason, '');
   assert.equal(data.byClass[0].discountRate, 0.05);
   assert.equal(data.byClass[0].discountedStudents, 1);
   assert.equal(data.summary.gross - data.summary.discount, data.summary.net);
   const report = createReport(data, 'discounts');
   assert.deepEqual(report.rows.map(row => row[0]), [2, 1]);
   assert.equal(report.rows[0][6], '20.0%');
+  assert.equal(report.headers[10], 'سبب الخصم');
+  assert.equal(report.rows[0][10], 'غير مسجل');
+  assert.equal(report.rows[1][10], 'خصم إخوة');
+  assert.equal(createReport(data, 'discounts', 'خصم اخوة').rows.length, 1);
   assert.equal(createReport(data, 'discounts', 'تجريبي أ', { className: 'الاول' }).rows.length, 1);
   assert.equal(createReport(data, 'discounts', '', { minRate: 15, maxRate: 25 }).rows.length, 1);
   assert.equal(createReport(data, 'discounts', '', { className: 'الثالث' }).rows.length, 0);

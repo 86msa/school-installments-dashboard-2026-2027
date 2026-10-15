@@ -154,10 +154,10 @@ function renderDiscounts() {
   $('discount-count').textContent = `${money(rows.length)} من ${money(state.data.summary.discountedStudents)} مستفيد`;
   const pages = Math.max(1, Math.ceil(rows.length / pageSize));
   state.discountsPage = Math.min(state.discountsPage, pages);
-  $('discounts-table').innerHTML = table(['الطالب', 'الصف', 'الشعبة', 'القسط قبل الخصم', 'الخصم', 'نسبة الخصم', 'الصافي', 'المقبوض', 'المتبقي'], rows.slice((state.discountsPage - 1) * pageSize, state.discountsPage * pageSize).map(row => [
+  $('discounts-table').innerHTML = table(['الطالب', 'الصف', 'الشعبة', 'القسط قبل الخصم', 'الخصم', 'نسبة الخصم', 'سبب الخصم', 'الصافي', 'المقبوض', 'المتبقي'], rows.slice((state.discountsPage - 1) * pageSize, state.discountsPage * pageSize).map(row => [
     { html: `<button class="row-button" data-student="${row.id}">${escapeHtml(row.name)}</button>` }, row.className, row.section || '—',
     { value: amount(row.gross), numeric: true }, { value: amount(row.discount), numeric: true },
-    { value: percent(row.discountRate), numeric: true }, { value: amount(row.net), numeric: true },
+    { value: percent(row.discountRate), numeric: true }, { html: `<span class="discount-reason">${escapeHtml(row.discountReason || 'غير مسجل')}</span>` }, { value: amount(row.net), numeric: true },
     { value: amount(row.paid), numeric: true }, { value: amount(row.balance), numeric: true }
   ]), 'لا يوجد طلاب حاصلون على خصومات ضمن هذه الفلاتر');
   $('discounts-pager').innerHTML = pager('discounts', state.discountsPage, pages);
@@ -461,7 +461,8 @@ function showStudent(id) {
   state.detail = { type: 'student', id: row.id };
   $('detail-print').textContent = '▧ معاينة وطباعة ملف الطالب';
   const receiptList = row.receipts.length ? row.receipts.map(r => `<div><span>وصل ${escapeHtml(r.number)} · ${dateLabel(r.date)}</span><strong>${amount(r.amount)}</strong></div>`).join('') : '<p class="detail-note">لا توجد وصولات قبض مسجلة.</p>';
-  $('detail-content').innerHTML = `<div class="detail-kicker">ملف الطالب · السنة الحالية</div><h2 id="detail-title">${escapeHtml(row.name)}</h2><div class="detail-sub">${escapeHtml(row.className)} · رقم الطالب ${escapeHtml(row.id)}</div><div class="detail-summary"><div class="detail-mini"><small>صافي القسط</small><strong>${amount(row.net)}</strong></div><div class="detail-mini"><small>الخصم</small><strong>${amount(row.discount)}</strong></div><div class="detail-mini"><small>المقبوض</small><strong>${amount(row.paid)}</strong></div><div class="detail-mini"><small>المتبقي</small><strong>${amount(row.balance)}</strong></div></div><h3>الاستحقاق القادم</h3><div class="detail-list"><div><span>التاريخ</span><strong>${dateLabel(row.nextDueDate)}</strong></div><div><span>قيمة القسط</span><strong>${amount(row.nextDueAmount)}</strong></div><div><span>الحالة</span>${statusBadge(row)}</div></div><h3>وصولات القبض</h3><div class="detail-list">${receiptList}</div><h3>بيانات الاتصال</h3><div class="detail-list"><div><span>هاتف الأب</span><strong>${escapeHtml(row.fatherMobile || '—')}</strong></div><div><span>هاتف الأم</span><strong>${escapeHtml(row.motherMobile || '—')}</strong></div></div><p class="detail-note">تُعرض ديون 2025–2026 في تقرير مستقل.</p>`;
+  const discountDetails = row.discount > 0 ? `<h3>تفاصيل الخصم</h3><div class="detail-list"><div><span>نسبة الخصم</span><strong>${percent(row.discountRate)}</strong></div><div><span>سبب الخصم</span><strong>${escapeHtml(row.discountReason || 'غير مسجل')}</strong></div></div>` : '';
+  $('detail-content').innerHTML = `<div class="detail-kicker">ملف الطالب · السنة الحالية</div><h2 id="detail-title">${escapeHtml(row.name)}</h2><div class="detail-sub">${escapeHtml(row.className)} · رقم الطالب ${escapeHtml(row.id)}</div><div class="detail-summary"><div class="detail-mini"><small>صافي القسط</small><strong>${amount(row.net)}</strong></div><div class="detail-mini"><small>الخصم</small><strong>${amount(row.discount)}</strong></div><div class="detail-mini"><small>المقبوض</small><strong>${amount(row.paid)}</strong></div><div class="detail-mini"><small>المتبقي</small><strong>${amount(row.balance)}</strong></div></div>${discountDetails}<h3>الاستحقاق القادم</h3><div class="detail-list"><div><span>التاريخ</span><strong>${dateLabel(row.nextDueDate)}</strong></div><div><span>قيمة القسط</span><strong>${amount(row.nextDueAmount)}</strong></div><div><span>الحالة</span>${statusBadge(row)}</div></div><h3>وصولات القبض</h3><div class="detail-list">${receiptList}</div><h3>بيانات الاتصال</h3><div class="detail-list"><div><span>هاتف الأب</span><strong>${escapeHtml(row.fatherMobile || '—')}</strong></div><div><span>هاتف الأم</span><strong>${escapeHtml(row.motherMobile || '—')}</strong></div></div><p class="detail-note">تُعرض ديون 2025–2026 في تقرير مستقل.</p>`;
   openDetail();
 }
 
@@ -617,6 +618,7 @@ function printDetail() {
   const details = previous ? [
     ['السنة الدراسية', latinDigits(row.year)], ['رقم الأرشيف', row.id], ['الصف السابق', row.className]
   ] : [
+    ...(row.discount > 0 ? [['سبب الخصم', row.discountReason || 'غير مسجل'], ['نسبة الخصم', percent(row.discountRate)]] : []),
     ['رقم الطالب', row.id], ['الصف', row.className], ['الشعبة', row.section], ['موعد القسط القادم', dateLabel(row.nextDueDate)], ['قيمة القسط القادم', amount(row.nextDueAmount)], ['هاتف الأب', row.fatherMobile], ['هاتف الأم', row.motherMobile]
   ];
   const receiptRows = row.receipts.map(receipt => [receipt.number, receipt.date, receipt.amount]);

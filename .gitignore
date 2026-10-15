@@ -10,4 +10,8 @@ dashboard-settings.json
 *.csv
 *.log
 .env*
+*.pfx
+*.p12
+*.key
+*.pem
 /*.png
