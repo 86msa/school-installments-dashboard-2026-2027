@@ -1,6 +1,6 @@
 'use strict';
 
-const state = { data: null, view: 'overview', loading: false, loadingPromise: null, studentsPage: 1, receiptsPage: 1, detail: null, printTitle: '' };
+const state = { data: null, view: 'overview', loading: false, loadingPromise: null, studentsPage: 1, receiptsPage: 1, discountsPage: 1, detail: null, printTitle: '' };
 const pageSize = 100;
 const $ = id => document.getElementById(id);
 const isolateNumber = value => `\u2066${value}\u2069`;
@@ -47,10 +47,19 @@ function renderOverview() {
   $('overview-cards').innerHTML = [
     card('الطلاب النشطون', money(s.students), 'طالب ضمن السنة الحالية', '♙'),
     card('صافي الأقساط', shortMoney(s.net), `بعد خصومات ${shortMoney(s.discount)}`, '▧'),
+    card('إجمالي الخصومات', amount(s.discount), `من الأقساط قبل الخصم: ${percent(s.discountRate)}`, '%'),
+    card('الطلاب المستفيدون', money(s.discountedStudents), `${percent(s.discountedStudentRate)} من الطلاب النشطين`, '♙'),
+    card('نسبة الخصومات', percent(s.discountRate), 'إجمالي الخصومات ÷ إجمالي الأقساط قبل الخصم', '%'),
     card('المبلغ المقبوض', shortMoney(s.paid), `نسبة التحصيل ${percent(s.collectionRate)}`, '↗', 'primary'),
     card('المبلغ المتبقي', shortMoney(s.balance), 'على الطلاب النشطين', '◴'),
     card('أقساط متأخرة', money(s.overdue), 'طلاب تجاوزوا موعد الاستحقاق', '!', 'warn')
   ].join('');
+
+  const discountAngle = Math.max(0, Math.min(360, s.discountRate * 360));
+  $('discount-chart').innerHTML = `<div class="donut-area discount-donut"><div class="donut"><div class="donut-inner"><strong>${percent(s.discountRate)}</strong><small>نسبة الخصومات</small></div></div><div class="legend"><div class="legend-item"><i class="legend-dot legend-discount"></i> الخصومات <strong>${amount(s.discount)}</strong></div><div class="legend-item"><i class="legend-dot legend-unpaid"></i> الصافي <strong>${amount(s.net)}</strong></div><div class="stat-help">قبل الخصم: ${amount(s.gross)}<br>المستفيدون: ${money(s.discountedStudents)} طالب</div></div></div>`;
+  $('discount-chart').querySelector('.donut').style.background = `conic-gradient(#9464bc 0deg ${discountAngle}deg, #e7eee9 ${discountAngle}deg 360deg)`;
+  $('discount-class-chart').innerHTML = byClass.length ? byClass.map(row => `<div class="discount-class-row"><span>${escapeHtml(row.className)}</span><strong>${amount(row.discount)} · ${percent(row.discountRate)}</strong><div class="class-track"><div class="discount-bar" data-width="${Math.max(0, Math.min(100, row.discountRate * 100))}"></div></div><small>${money(row.discountedStudents)} مستفيد من ${money(row.count)} طالب</small></div>`).join('') : '<div class="empty">لا توجد صفوف</div>';
+  $('discount-class-chart').querySelectorAll('[data-width]').forEach(bar => { bar.style.width = `${bar.dataset.width}%`; });
 
   const max = Math.max(1, ...paymentMonths.map(row => row.amount));
   $('monthly-chart').innerHTML = paymentMonths.length ? paymentMonths.map(row => {
@@ -89,6 +98,7 @@ function fillSelect(id, values, allLabel, formatLabel = value => value) {
 function prepareFilters() {
   const classes = state.data.byClass.map(row => row.className);
   fillSelect('students-class', classes, 'كل الصفوف');
+  fillSelect('discounts-class', classes, 'كل الصفوف');
   fillSelect('receipts-class', classes, 'كل الصفوف');
   fillSelect('report-class', classes, 'كل الصفوف');
 }
@@ -121,6 +131,36 @@ function renderStudents() {
     { value: amount(row.balance), numeric: true }, dateLabel(row.nextDueDate), { html: statusBadge(row) }
   ]));
   $('students-pager').innerHTML = pager('students', state.studentsPage, pages);
+}
+
+function discountFilters() {
+  return { className: $('discounts-class').value, minRate: $('discounts-min-rate').value, maxRate: $('discounts-max-rate').value };
+}
+
+function filteredDiscounts() {
+  return window.ReportData.selectDiscounts(state.data, $('discounts-search').value, discountFilters());
+}
+
+function renderDiscounts() {
+  if (!state.data) return;
+  const rows = filteredDiscounts();
+  const total = rows.reduce((sum, row) => sum + row.discount, 0);
+  const gross = rows.reduce((sum, row) => sum + row.gross, 0);
+  $('discount-cards').innerHTML = [
+    card('خصومات النتائج المعروضة', amount(total), 'مجموع الخصومات بعد البحث والفلترة', '%', 'primary'),
+    card('الطلاب المستفيدون', money(rows.length), `من ${money(state.data.summary.discountedStudents)} مستفيد في السنة الحالية`, '♙'),
+    card('نسبة خصومات النتائج', percent(gross > 0 ? total / gross : 0), 'من إجمالي أقساط الطلاب الظاهرين قبل الخصم', '%')
+  ].join('');
+  $('discount-count').textContent = `${money(rows.length)} من ${money(state.data.summary.discountedStudents)} مستفيد`;
+  const pages = Math.max(1, Math.ceil(rows.length / pageSize));
+  state.discountsPage = Math.min(state.discountsPage, pages);
+  $('discounts-table').innerHTML = table(['الطالب', 'الصف', 'الشعبة', 'القسط قبل الخصم', 'الخصم', 'نسبة الخصم', 'الصافي', 'المقبوض', 'المتبقي'], rows.slice((state.discountsPage - 1) * pageSize, state.discountsPage * pageSize).map(row => [
+    { html: `<button class="row-button" data-student="${row.id}">${escapeHtml(row.name)}</button>` }, row.className, row.section || '—',
+    { value: amount(row.gross), numeric: true }, { value: amount(row.discount), numeric: true },
+    { value: percent(row.discountRate), numeric: true }, { value: amount(row.net), numeric: true },
+    { value: amount(row.paid), numeric: true }, { value: amount(row.balance), numeric: true }
+  ]), 'لا يوجد طلاب حاصلون على خصومات ضمن هذه الفلاتر');
+  $('discounts-pager').innerHTML = pager('discounts', state.discountsPage, pages);
 }
 
 function filteredReceipts() {
@@ -217,7 +257,7 @@ function renderReports() {
 function renderAll() {
   if (!state.data) return;
   prepareFilters();
-  renderOverview(); renderStudents(); renderReceipts(); renderPrevious(); renderReports();
+  renderOverview(); renderStudents(); renderDiscounts(); renderReceipts(); renderPrevious(); renderReports();
   const when = state.data.readAt ? new Date(state.data.readAt).toLocaleString('ar-IQ-u-nu-latn', { timeZone: 'Asia/Baghdad', dateStyle: 'medium', timeStyle: 'short' }) : 'الآن';
   $('last-updated').textContent = `آخر قراءة من قاعدة البرنامج: ${when}`;
   const warnings = state.data.warnings;
@@ -405,6 +445,7 @@ function navigate(view) {
   document.querySelectorAll('.view').forEach(section => section.classList.toggle('active', section.id === view));
   document.querySelectorAll('.nav-button').forEach(button => button.classList.toggle('active', button.dataset.view === view));
   const names = { overview: ['نظرة عامة على الأقساط', `متابعة التحصيل والاستحقاقات للعام الدراسي ${schoolYear}`], students: ['الطلاب والأقساط', 'تفاصيل الحسابات والحالات المستحقة'], receipts: ['وصولات القبض', 'حركة التحصيل من قاعدة بيانات البرنامج'], previous: ['ديون سنة 2025–2026', 'الأرصدة ووصولات سدادها لهذه السنة فقط'], reports: ['التقارير التفصيلية', 'كشوف قابلة للطباعة والتصدير'], settings: ['الإعدادات', 'اختيار قاعدة البيانات التي تغذي اللوحة'] };
+  names.discounts = ['الخصومات', 'مبالغ الخصومات ونسبها والطلاب المستفيدون لسنة 2026–2027'];
   $('page-title').textContent = names[view][0];
   $('page-subtitle').textContent = names[view][1];
   $('print-current').hidden = view === 'settings';
@@ -452,6 +493,7 @@ function exportReport() {
 
 function sectionExportReport() {
   if (state.view === 'overview') return window.ReportData.createReport(state.data, 'classes');
+  if (state.view === 'discounts') return window.ReportData.createReport(state.data, 'discounts', $('discounts-search').value, discountFilters());
   if (state.view === 'students') return {
     title: 'كشف الطلاب والأقساط',
     headers: ['رقم الطالب', 'الاسم', 'الصف', 'الإجمالي', 'الخصم', 'الصافي', 'المقبوض', 'المتبقي', 'موعد القسط القادم', 'الحالة'],
@@ -582,6 +624,13 @@ function printDetail() {
   showPrintPreview(title, wrapPrint(title, previous ? `السنة ${latinDigits(row.year)}` : `العام الدراسي ${schoolYear}`, content), 'portrait');
 }
 
+function printDiscountVisuals() {
+  const { summary: s, byClass } = state.data;
+  const angle = Math.max(0, Math.min(360, s.discountRate * 360));
+  const classes = byClass.map(row => `<div class="print-discount-class"><span>${escapeHtml(row.className)}</span><strong>${amount(row.discount)} · ${percent(row.discountRate)}</strong><div class="print-class-track"><i style="background:#9464bc;width:${Math.max(0, Math.min(100, row.discountRate * 100))}%"></i></div><small>${money(row.discountedStudents)} مستفيد</small></div>`).join('');
+  return `<div class="print-chart-grid"><section class="print-chart-card"><h2>الخصومات من إجمالي الأقساط</h2><p>الخصومات ÷ الأقساط قبل الخصم · سنة 2026–2027</p><div class="print-status"><div class="print-donut" style="background:conic-gradient(#9464bc 0deg ${angle}deg, #e7eee9 ${angle}deg 360deg)"><div>${percent(s.discountRate)}<small>نسبة الخصومات</small></div></div><div class="print-legend"><span>الخصومات <strong>${amount(s.discount)}</strong></span><span>الصافي <strong>${amount(s.net)}</strong></span><span>المستفيدون <strong>${money(s.discountedStudents)}</strong></span></div></div></section><section class="print-chart-card"><h2>الخصومات حسب الصف</h2><p>المبلغ ونسبته من إجمالي أقساط كل صف قبل الخصم</p><div class="print-classes">${classes}</div></section></div>`;
+}
+
 function printOverviewVisuals() {
   const { summary: s, paymentMonths, byClass, students } = state.data;
   const maxMonth = Math.max(1, ...paymentMonths.map(row => row.amount));
@@ -611,7 +660,8 @@ function printCurrent() {
     title = 'ملخص الأقساط';
     const s = state.data.summary;
     summary = `<div class="print-summary"><div>الطلاب النشطون<strong>${money(s.students)}</strong></div><div>صافي الأقساط<strong>${amount(s.net)}</strong></div><div>المقبوض<strong>${amount(s.paid)}</strong></div><div>المتبقي<strong>${amount(s.balance)}</strong></div><div>ديون 2025–2026<strong>${amount(s.previousBalance)}</strong></div></div>`;
-    visuals = printOverviewVisuals();
+    summary += `<div class="print-summary"><div>إجمالي الخصومات<strong>${amount(s.discount)}</strong></div><div>نسبة الخصومات قبل الخصم<strong>${percent(s.discountRate)}</strong></div><div>الطلاب المستفيدون<strong>${money(s.discountedStudents)}</strong></div><div>نسبتهم من الطلاب<strong>${percent(s.discountedStudentRate)}</strong></div></div>`;
+    visuals = printDiscountVisuals() + printOverviewVisuals();
     const report = window.ReportData.createReport(state.data, 'classes');
     headers = report.headers; rows = report.rows; monetary = [2, 3, 4, 5, 6];
     subtitle = 'ملخص التحصيل حسب الصف';
@@ -622,6 +672,15 @@ function printCurrent() {
     headers = ['الطالب', 'الصف', 'الإجمالي', 'الخصم', 'المقبوض', 'المتبقي', 'القسط القادم', 'الحالة'];
     rows = selected.map(row => [row.name, row.className, row.gross, row.discount, row.paid, row.balance, row.nextDueDate, row.overdue ? 'متأخر' : row.status === 'paid' ? 'مسدد' : row.status === 'partial' ? 'جزئي' : 'غير مدفوع']);
     monetary = [2, 3, 4, 5];
+  } else if (state.view === 'discounts') {
+    const report = sectionExportReport();
+    title = report.title;
+    headers = report.headers; rows = report.rows; monetary = [4, 5, 7, 8, 9];
+    const selected = filteredDiscounts();
+    const discount = selected.reduce((sum, row) => sum + row.discount, 0);
+    const gross = selected.reduce((sum, row) => sum + row.gross, 0);
+    subtitle = 'سنة 2026–2027 · نتائج البحث والفلترة الحالية · نسبة كل طالب من قسطه قبل الخصم';
+    summary = `<div class="print-summary"><div>المستفيدون<strong>${money(selected.length)}</strong></div><div>إجمالي الخصومات<strong>${amount(discount)}</strong></div><div>إجمالي الأقساط قبل الخصم<strong>${amount(gross)}</strong></div><div>نسبة خصومات النتائج<strong>${percent(gross > 0 ? discount / gross : 0)}</strong></div></div>`;
   } else if (state.view === 'receipts') {
     title = 'وصولات القبض';
     const selected = filteredReceipts();
@@ -650,12 +709,14 @@ function printCurrent() {
 function clearFilters(section) {
   const fields = {
     students: ['students-search', 'students-min', 'students-max'],
+    discounts: ['discounts-search', 'discounts-min-rate', 'discounts-max-rate'],
     receipts: ['receipts-search', 'receipts-from', 'receipts-to'],
     previous: ['previous-search', 'previous-min'],
     reports: ['report-search', 'report-from', 'report-to']
   }[section];
   fields.forEach(id => { $(id).value = ''; });
   if (section === 'students') { $('students-class').value = 'all'; $('students-status').value = 'all'; state.studentsPage = 1; renderStudents(); }
+  if (section === 'discounts') { $('discounts-class').value = 'all'; state.discountsPage = 1; renderDiscounts(); }
   if (section === 'receipts') { $('receipts-class').value = 'all'; state.receiptsPage = 1; renderReceipts(); }
   if (section === 'previous') { $('previous-status').value = 'open'; renderPrevious(); }
   if (section === 'reports') { $('report-class').value = 'all'; renderReports(); }
@@ -672,9 +733,10 @@ document.addEventListener('click', event => {
   if (previous) showPrevious(previous.dataset.previous);
   const page = event.target.closest('[data-page-target]');
   if (page && !page.disabled) {
+    const panel = page.closest('.table-panel');
     state[`${page.dataset.pageTarget}Page`] = Number(page.dataset.page);
-    if (page.dataset.pageTarget === 'students') renderStudents(); else renderReceipts();
-    page.closest('.table-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (page.dataset.pageTarget === 'students') renderStudents(); else if (page.dataset.pageTarget === 'discounts') renderDiscounts(); else renderReceipts();
+    panel?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
   if (event.target.closest('[data-close-detail]')) closeDetail();
   if (event.target.closest('[data-close-preview]')) closePrintPreview();
@@ -692,6 +754,7 @@ $('refresh-button').addEventListener('click', () => load(true));
 for (const id of ['students-search', 'students-class', 'students-status', 'students-min', 'students-max']) $(id).addEventListener('input', () => { state.studentsPage = 1; renderStudents(); });
 for (const id of ['receipts-search', 'receipts-class', 'receipts-from', 'receipts-to']) $(id).addEventListener('input', () => { state.receiptsPage = 1; renderReceipts(); });
 for (const id of ['previous-search', 'previous-status', 'previous-min']) $(id).addEventListener('input', renderPrevious);
+for (const id of ['discounts-search', 'discounts-class', 'discounts-min-rate', 'discounts-max-rate']) $(id).addEventListener('input', () => { state.discountsPage = 1; renderDiscounts(); });
 for (const id of ['report-type', 'report-search', 'report-class', 'report-from', 'report-to']) $(id).addEventListener('input', renderReports);
 $('export-button').addEventListener('click', exportReport);
 $('print-button').addEventListener('click', printCurrent);

@@ -64,7 +64,50 @@ test('previous debt totals and reports include only 2025–2026', () => {
 test('parses amount and percentage discounts', () => {
   assert.equal(discountAmount('420,000', 3_200_000), 420_000);
   assert.equal(discountAmount('5%', 3_200_000), 160_000);
+  assert.equal(discountAmount('١٠٪', 3_200_000), 320_000);
+  assert.equal(discountAmount('۵％', 3_200_000), 160_000);
+  assert.equal(discountAmount('١٢٫٥٪', 3_200_000), 400_000);
   assert.equal(schoolYear('2024 / 2023'), '2023–2024');
+});
+
+test('discount totals use weighted gross fees and keep deleted and prior-year students out', () => {
+  const data = buildDashboard({
+    students: [
+      { ID: 1, StName: 'طالب تجريبي أ', Class: 'الاول', QstAll: 1000, DisCount: '10٪', Baqi: 900 },
+      { ID: 2, StName: 'طالب تجريبي ب', Class: 'الثاني', QstAll: 3000, DisCount: '600', Baqi: 2400 },
+      { ID: 3, StName: 'دون خصم', Class: 'الاول', QstAll: 1000, DisCount: '', Baqi: 1000 },
+      { ID: 4, StName: 'محذوف', Class: 'الاول', QstAll: 10000, DisCount: '50%', Deleted: true }
+    ], receipts: [],
+    previousStudents: [{ ID: 1, sn: '2025 / 2026', QstAll: 10000, DisCount: '50%' }], previousReceipts: []
+  });
+  assert.equal(data.summary.discount, 700);
+  assert.equal(data.summary.discountRate, 0.14);
+  assert.equal(data.summary.discountedStudents, 2);
+  assert.equal(data.summary.discountedStudentRate, 2 / 3);
+  assert.equal(data.students[0].discountRate, 0.1);
+  assert.equal(data.byClass[0].discountRate, 0.05);
+  assert.equal(data.byClass[0].discountedStudents, 1);
+  assert.equal(data.summary.gross - data.summary.discount, data.summary.net);
+  const report = createReport(data, 'discounts');
+  assert.deepEqual(report.rows.map(row => row[0]), [2, 1]);
+  assert.equal(report.rows[0][6], '20.0%');
+  assert.equal(createReport(data, 'discounts', 'تجريبي أ', { className: 'الاول' }).rows.length, 1);
+  assert.equal(createReport(data, 'discounts', '', { minRate: 15, maxRate: 25 }).rows.length, 1);
+  assert.equal(createReport(data, 'discounts', '', { className: 'الثالث' }).rows.length, 0);
+  assert.equal(createReport(data, 'discounts', '', { minRate: 25, maxRate: 15 }).rows.length, 0);
+  assert.match(toCsv(report), /نسبة الخصم/);
+});
+
+test('empty data and full discounts produce finite rates', () => {
+  const empty = buildDashboard({});
+  assert.equal(empty.summary.discountRate, 0);
+  assert.equal(empty.summary.discountedStudentRate, 0);
+  assert.deepEqual(createReport(empty, 'discounts').rows, []);
+  const full = buildDashboard({ students: [{ ID: 1, QstAll: 1000, DisCount: '100%' }, { ID: 2, QstAll: 0 }] });
+  assert.equal(full.students[0].net, 0);
+  assert.equal(full.students[0].discountRate, 1);
+  assert.equal(full.students[1].discountRate, 0);
+  assert.equal(full.summary.discountRate, 1);
 });
 
 test('detailed reports keep previous debts separate and produce Arabic CSV', () => {

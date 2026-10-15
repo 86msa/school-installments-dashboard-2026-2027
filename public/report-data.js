@@ -15,6 +15,17 @@ function matchesFields(fields, query) {
   return terms.every(term => haystack.includes(term));
 }
 
+function selectDiscounts(data, query = '', filters = {}) {
+  const minRate = filters.minRate == null || filters.minRate === '' ? null : Number(filters.minRate);
+  const maxRate = filters.maxRate == null || filters.maxRate === '' ? null : Number(filters.maxRate);
+  return data.students.filter(r => r.discount > 0 &&
+    (!filters.className || filters.className === 'all' || r.className === filters.className) &&
+    (minRate === null || (r.gross > 0 ? r.discount / r.gross * 100 : 0) >= minRate) &&
+    (maxRate === null || (r.gross > 0 ? r.discount / r.gross * 100 : 0) <= maxRate) &&
+    matchesFields([r.name, r.id, r.className, r.section, r.fatherMobile, r.motherMobile], query))
+    .sort((a, b) => b.discount - a.discount || String(a.name).localeCompare(String(b.name), 'ar'));
+}
+
 function createReport(data, type = 'classes', query = '', filters = {}) {
   let title, headers, rows;
   const className = filters.className || 'all';
@@ -23,10 +34,16 @@ function createReport(data, type = 'classes', query = '', filters = {}) {
   const to = filters.to || '';
   if (type === 'classes') {
     title = 'ملخص الأقساط حسب الصف';
-    headers = ['الصف', 'الطلاب', 'الإجمالي', 'الخصومات', 'الصافي', 'المقبوض', 'المتبقي', 'المتأخرون', 'نسبة التحصيل'];
+    headers = ['الصف', 'الطلاب', 'الإجمالي', 'الخصومات', 'الصافي', 'المقبوض', 'المتبقي', 'المتأخرون', 'نسبة التحصيل', 'نسبة الخصومات', 'المستفيدون من الخصم'];
     rows = data.byClass.filter(r => (className === 'all' || r.className === className) && matchesFields([r.className], query)).map(r =>
       [r.className, r.count, r.gross, r.discount, r.net, r.paid, r.balance, r.overdue,
-        r.net ? `${(r.paid / r.net * 100).toFixed(1)}%` : '0%']);
+        r.net ? `${(r.paid / r.net * 100).toFixed(1)}%` : '0%',
+        r.gross > 0 ? `${(r.discount / r.gross * 100).toFixed(1)}%` : '0%', r.discountedStudents || 0]);
+  } else if (type === 'discounts') {
+    title = 'كشف الطلاب الحاصلين على الخصومات';
+    headers = ['رقم الطالب', 'الاسم', 'الصف', 'الشعبة', 'الإجمالي', 'الخصم', 'نسبة الخصم', 'الصافي', 'المقبوض', 'المتبقي'];
+    rows = selectDiscounts(data, query, filters).map(r => [r.id, r.name, r.className, r.section,
+      r.gross, r.discount, `${(r.gross > 0 ? r.discount / r.gross * 100 : 0).toFixed(1)}%`, r.net, r.paid, r.balance]);
   } else if (['students', 'overdue', 'unpaid', 'partial', 'paid'].includes(type)) {
     title = { students: 'تقرير أقساط الطلاب', overdue: 'كشف الأقساط المتأخرة',
       unpaid: 'الطلاب غير الدافعين', partial: 'المدفوع جزئياً', paid: 'المسددون بالكامل' }[type];
@@ -67,6 +84,6 @@ function toCsv(report) {
   return '\uFEFF' + [report.headers, ...report.rows].map(row => row.map(protect).join(',')).join('\r\n');
 }
 
-if (typeof module !== 'undefined' && module.exports) module.exports = { createReport, toCsv, searchText, matchesFields };
-if (typeof window !== 'undefined') window.ReportData = { createReport, toCsv, searchText, matchesFields };
+if (typeof module !== 'undefined' && module.exports) module.exports = { createReport, toCsv, searchText, matchesFields, selectDiscounts };
+if (typeof window !== 'undefined') window.ReportData = { createReport, toCsv, searchText, matchesFields, selectDiscounts };
 })();

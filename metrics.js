@@ -5,12 +5,12 @@ function number(value) {
   if (value == null) return 0;
   const digits = String(value).replace(/[٠-٩]/g, c => '٠١٢٣٤٥٦٧٨٩'.indexOf(c))
     .replace(/[۰-۹]/g, c => '۰۱۲۳۴۵۶۷۸۹'.indexOf(c));
-  const parsed = Number(digits.replace(/[,٬\s]/g, ''));
+  const parsed = Number(digits.replace(/[,٬\s]/g, '').replace(/٫/g, '.'));
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function discountAmount(value, gross) {
-  const text = String(value ?? '').trim();
+  const text = String(value ?? '').trim().replace(/[٪％]/g, '%');
   if (!text || text === '%') return 0;
   return text.endsWith('%') ? Math.round(gross * number(text.slice(0, -1)) / 100) : number(text);
 }
@@ -61,7 +61,7 @@ function buildDashboard(raw, today = new Date()) {
     const nextDueDate = student.DateNextQst || '';
     return {
       id: student.ID, name: student.StName || '', className: student.Class || '',
-      section: student.Shu || '', gross, discount, net, paid, balance,
+      section: student.Shu || '', gross, discount, discountRate: gross > 0 ? discount / gross : 0, net, paid, balance,
       recordedBalance, discrepancy: net - paid - recordedBalance,
       status, nextDueDate, nextDueAmount: number(student.ValueNextQst),
       overdue: balance > 0 && Boolean(nextDueDate) && nextDueDate < dateKey,
@@ -123,6 +123,13 @@ function buildDashboard(raw, today = new Date()) {
     previousDebtStudents: previousDebts.filter(s => s.balance > 0).length,
     collectionRate: sum(students, 'net') ? sum(students, 'paid') / sum(students, 'net') : 0
   };
+  summary.discountedStudents = students.filter(student => student.discount > 0).length;
+  summary.discountRate = summary.gross > 0 ? summary.discount / summary.gross : 0;
+  summary.discountedStudentRate = summary.students ? summary.discountedStudents / summary.students : 0;
+  for (const row of byClass.values()) {
+    row.discountRate = row.gross > 0 ? row.discount / row.gross : 0;
+    row.discountedStudents = students.filter(student => student.className === row.className && student.discount > 0).length;
+  }
   const warnings = {
     currentBalanceMismatch: students.filter(s => Math.abs(s.discrepancy) > 1).length,
     previousBalanceMismatch: previousDebts.filter(s => Math.abs(s.discrepancy) > 1).length,

@@ -21,6 +21,10 @@ body.portrait #print-document { width: 210mm; min-height: 297mm; }
 .print-chart-card { border: 1px solid #d5e4d9; border-radius: 8px; padding: 9px 11px; break-inside: avoid; min-width: 0; }
 .print-chart-card h2 { margin: 0; font-size: 14px; color: #1c5035; }
 .print-chart-card p { margin: 0 0 7px; color: #587160; font-size: 9px; }
+.print-discount-class { display: grid; grid-template-columns: 1fr auto; gap: 3px 8px; font-size: 10px; break-inside: avoid; }
+.print-discount-class .print-class-track { grid-column: 1 / -1; }
+.print-discount-class strong { white-space: nowrap; font-size: 10px; }
+.print-discount-class small { color: #587160; }
 .print-wide { grid-column: 1 / -1; }
 .print-monthly { display: flex; align-items: end; justify-content: space-around; gap: 3px; height: 130px; }
 .print-month { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; }

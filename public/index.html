@@ -17,6 +17,7 @@
       <nav class="nav">
         <button class="nav-button active" data-view="overview"><span class="nav-icon">▦</span> نظرة عامة</button>
         <button class="nav-button" data-view="students"><span class="nav-icon">♙</span> الطلاب والأقساط</button>
+        <button class="nav-button" data-view="discounts"><span class="nav-icon">%</span> الخصومات</button>
         <button class="nav-button" data-view="receipts"><span class="nav-icon">▤</span> وصولات القبض</button>
         <button class="nav-button" data-view="previous"><span class="nav-icon">◴</span> ديون 2025–2026</button>
         <button class="nav-button" data-view="reports"><span class="nav-icon">▧</span> التقارير</button>
@@ -33,7 +34,11 @@
       <div id="message" class="message" role="status" hidden></div>
 
       <section id="overview" class="view active" aria-label="نظرة عامة">
-        <div id="overview-cards" class="cards-grid"></div>
+        <div id="overview-cards" class="cards-grid overview-cards"></div>
+        <div class="section-grid discount-grid">
+          <article class="panel"><div class="panel-heading"><div><h2>الخصومات من إجمالي الأقساط</h2><p>نسبة الخصومات إلى الأقساط قبل الخصم لسنة 2026–2027</p></div><button class="text-button" data-go="discounts" type="button">كشف الخصومات ←</button></div><div id="discount-chart"></div></article>
+          <article class="panel"><div class="panel-heading"><div><h2>الخصومات حسب الصف</h2><p>مبلغ الخصم ونسبته من إجمالي أقساط كل صف</p></div></div><div id="discount-class-chart" class="class-chart"></div></article>
+        </div>
         <div class="section-grid">
           <article class="panel panel-wide"><div class="panel-heading"><div><h2>التحصيل الشهري</h2><p>المبالغ المقبوضة بحسب تاريخ الوصل</p></div><span class="panel-mark">●</span></div><div id="monthly-chart" class="monthly-chart"></div></article>
           <article class="panel"><div class="panel-heading"><div><h2>حالة سداد الطلاب</h2><p>وفق صافي القسط بعد الخصم</p></div></div><div id="status-chart"></div></article>
@@ -51,6 +56,13 @@
         <div class="panel table-panel"><p class="table-hint">مرّر الجدول أفقياً لعرض بقية الأعمدة.</p><div id="students-table" class="table-wrap"></div><div id="students-pager" class="pager"></div></div>
       </section>
 
+      <section id="discounts" class="view" aria-label="الخصومات">
+        <div class="view-heading"><div><h2>الطلاب الحاصلون على الخصومات</h2><p>السنة 2026–2027 · نسبة كل طالب = الخصم ÷ القسط قبل الخصم. القائمة مرتبة حسب مبلغ الخصم.</p></div><span id="discount-count" class="count-pill"></span></div>
+        <div id="discount-cards" class="cards-grid three-cards"></div>
+        <div class="filterbar"><label>بحث متعدد الكلمات<input id="discounts-search" type="search" placeholder="الاسم، الرقم، الصف أو الهاتف"></label><label>الصف<select id="discounts-class"></select></label><label>نسبة الخصم من<input id="discounts-min-rate" type="number" min="0" step="0.1" placeholder="0%"></label><label>نسبة الخصم إلى<input id="discounts-max-rate" type="number" min="0" step="0.1" placeholder="100%"></label><button class="button button-outline filter-clear" data-clear="discounts" type="button">مسح الفلاتر</button></div>
+        <div class="panel table-panel"><p class="table-hint">الإحصائيات أعلاه تخص نتائج البحث والفلترة. النسبة الإجمالية هي مجموع الخصومات ÷ مجموع الأقساط قبل الخصم للطلاب الظاهرين.</p><div id="discounts-table" class="table-wrap"></div><div id="discounts-pager" class="pager"></div></div>
+      </section>
+
       <section id="receipts" class="view" aria-label="وصولات القبض">
         <div class="view-heading"><div><h2>سجل وصولات القبض</h2><p>كل وصل مرتبط برقم الطالب المسجل في سنة <bdi dir="ltr">2026–2027</bdi>.</p></div><span id="receipt-count" class="count-pill"></span></div>
         <div class="filterbar"><label>بحث متعدد الكلمات<input id="receipts-search" type="search" placeholder="الطالب، رقم الوصل أو الملاحظات"></label><label>الصف<select id="receipts-class"></select></label><label>من تاريخ<input id="receipts-from" type="date"></label><label>إلى تاريخ<input id="receipts-to" type="date"></label><button class="button button-outline filter-clear" data-clear="receipts" type="button">مسح الفلاتر</button></div>
@@ -66,7 +78,7 @@
 
       <section id="reports" class="view" aria-label="التقارير">
         <div class="view-heading"><div><h2>اختر التقرير</h2><p>حدد نوع الكشف، ثم راجع تفاصيله واطبعه أو احفظه.</p></div></div>
-        <div class="filterbar report-controls"><label>نوع التقرير<select id="report-type"><option value="classes">ملخص الصفوف</option><option value="students">أقساط الطلاب</option><option value="unpaid">الطلاب غير الدافعين</option><option value="partial">المدفوع جزئياً</option><option value="paid">المسددون بالكامل</option><option value="overdue">الأقساط المتأخرة</option><option value="receipts">وصولات القبض</option><option value="previous-open">ديون 2025–2026 القائمة</option><option value="previous">كل سجلات ديون 2025–2026</option></select></label><label>بحث متعدد الكلمات<input id="report-search" type="search" placeholder="اسم، رقم، صف أو ملاحظة"></label><label id="report-class-wrap">الصف<select id="report-class"></select></label><label id="report-from-wrap" hidden>من تاريخ<input id="report-from" type="date"></label><label id="report-to-wrap" hidden>إلى تاريخ<input id="report-to" type="date"></label><button class="button button-outline filter-clear" data-clear="reports" type="button">مسح الفلاتر</button><div class="report-actions"><label>صيغة التصدير<select id="export-format"><option value="xlsx">جدول إكسل</option><option value="csv">جدول نصي</option><option value="pdf">بي دي إف</option></select></label><button id="export-button" class="button button-primary" type="button">↓ تصدير</button><button id="print-button" class="button button-outline" type="button">▧ معاينة وطباعة</button></div></div>
+        <div class="filterbar report-controls"><label>نوع التقرير<select id="report-type"><option value="classes">ملخص الصفوف</option><option value="students">أقساط الطلاب</option><option value="discounts">الطلاب الحاصلون على الخصومات</option><option value="unpaid">الطلاب غير الدافعين</option><option value="partial">المدفوع جزئياً</option><option value="paid">المسددون بالكامل</option><option value="overdue">الأقساط المتأخرة</option><option value="receipts">وصولات القبض</option><option value="previous-open">ديون 2025–2026 القائمة</option><option value="previous">كل سجلات ديون 2025–2026</option></select></label><label>بحث متعدد الكلمات<input id="report-search" type="search" placeholder="اسم، رقم، صف أو ملاحظة"></label><label id="report-class-wrap">الصف<select id="report-class"></select></label><label id="report-from-wrap" hidden>من تاريخ<input id="report-from" type="date"></label><label id="report-to-wrap" hidden>إلى تاريخ<input id="report-to" type="date"></label><button class="button button-outline filter-clear" data-clear="reports" type="button">مسح الفلاتر</button><div class="report-actions"><label>صيغة التصدير<select id="export-format"><option value="xlsx">جدول إكسل</option><option value="csv">جدول نصي</option><option value="pdf">بي دي إف</option></select></label><button id="export-button" class="button button-primary" type="button">↓ تصدير</button><button id="print-button" class="button button-outline" type="button">▧ معاينة وطباعة</button></div></div>
         <article class="panel table-panel"><div class="report-heading"><h3 id="report-title"></h3><span id="report-meta"></span></div><p class="table-hint">مرّر الجدول أفقياً لعرض بقية الأعمدة.</p><div id="report-table" class="table-wrap"></div></article>
       </section>
 
