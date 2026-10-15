@@ -60,11 +60,11 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 }
 
 .main { min-width: 0; max-width: 1600px; width: 100%; margin: auto; padding: 32px 38px 20px; }
-.topbar { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 29px; }
+.topbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 29px; }
 .eyebrow { color: #247756; font-weight: 700; font-size: 12px; margin-bottom: 6px; }
 .topbar h1 { font-size: clamp(25px, 2.2vw, 31px); line-height: 1.4; margin: 0 0 5px; color: #16392c; font-weight: 700; }
 .topbar p { margin: 0; color: #61766b; font-size: 13px; line-height: 1.7; }
-.top-actions { display: flex; align-items: center; gap: 10px; }
+.top-actions { display: flex; flex-wrap: wrap; max-width: 100%; align-items: center; gap: 10px; }
 .export-wrap { position: relative; }
 .export-menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 20; min-width: 165px; padding: 5px; background: white; border: 1px solid #d8e7db; border-radius: 11px; box-shadow: 0 12px 32px #183c2930; display: grid; }
 .export-menu button { border: 0; background: transparent; color: #27553b; text-align: right; border-radius: 7px; padding: 9px 12px; white-space: nowrap; font-size: 12px; }
@@ -261,7 +261,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 
 @media (max-width: 1300px) {
   .cards-grid, .cards-grid.overview-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .section-grid { grid-template-columns: 1fr; }
+  .section-grid, .section-grid.discount-grid { grid-template-columns: 1fr; }
   .main { padding: 28px 25px; }
   .settings-grid { grid-template-columns: 1fr; max-width: 850px; }
 }
